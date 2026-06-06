@@ -237,7 +237,7 @@
     },
     {
       "parameters": {
-        "sendTo": "=inquiry.asdautomations@gmail.com",
+        "sendTo": "=your-email@gmail.com",
         "subject": "=Thanks for coming back, {{ $json.customer_name }}! 🙌",
         "message": "=Hi {{ $json.customer_name }},<p>\n\nWe're happy to see you shopping with us again! Your continued support means a lot.<p>\n\n📦 **Order Details**<p>\n\n* Order #: {{ $json.order_number }}<br>\n* Product: {{ $json.product }}<br>\n* Total: ${{ $json.order_total }}<p>\n\nAs a valued returning customer, we've prepared a special reward for you.<p>\n\n🎁 **15% OFF your next order**<p>\n\n**Promo Code:** RETURN15<p>\n\nThank you for choosing ShopFlow Store. We can't wait to serve you again.<p>\n\nBest regards,<br>\n**ShopFlow Store Team**\n",
         "options": {
@@ -262,7 +262,7 @@
     },
     {
       "parameters": {
-        "sendTo": "=inquiry.asdautomations@gmail.com",
+        "sendTo": "=your-email@gmail.com",
         "subject": "=Exclusive VIP Reward for You, {{ $json.customer_name }}! ⭐",
         "message": "=Hi {{ $json.customer_name }},<p>\n\nYou're one of our most valued customers, and we want to thank you for your continued trust in ShopFlow Store.<p>\n\n📦 **Order Details**<p>\n\n* Order #: {{ $json.order_number }}<br>\n* Product: {{ $json.product }}<br>\n* Total: ${{ $json.order_total }}<p>\n\nAs a VIP member, you have unlocked an exclusive reward:<p>\n\n🌟 **25% OFF your next purchase**<p>\n\n**VIP Promo Code:** VIP25<p>\n\nPlus, you'll receive early access to selected promotions and special offers.<p>\n\nThank you for being part of our VIP community.<p>\n\nWarm regards,<br>\n**ShopFlow Store Team**\n",
         "options": {
@@ -290,17 +290,17 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo",
+          "value": "YOUR_GOOGLE_SHEET_ID",
           "mode": "list",
           "cachedResultName": "ShopFlow CRM",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo/edit?usp=drivesdk"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
           "value": 508059576,
           "mode": "list",
           "cachedResultName": "Customers",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo/edit#gid=508059576"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=508059576"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -394,17 +394,17 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo",
+          "value": "YOUR_GOOGLE_SHEET_ID",
           "mode": "list",
           "cachedResultName": "ShopFlow CRM",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo/edit?usp=drivesdk"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
           "value": 1513992644,
           "mode": "list",
           "cachedResultName": "Orders",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo/edit#gid=1513992644"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=1513992644"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -508,17 +508,17 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo",
+          "value": "YOUR_GOOGLE_SHEET_ID",
           "mode": "list",
           "cachedResultName": "ShopFlow CRM",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo/edit?usp=drivesdk"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
           "value": 2102531066,
           "mode": "list",
           "cachedResultName": "Email History",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo/edit#gid=2102531066"
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=2102531066"
         },
         "columns": {
           "mappingMode": "defineBelow",
@@ -680,7 +680,7 @@
     },
     {
       "parameters": {
-        "sendTo": "=inquiry.asdautomations@gmail.com",
+        "sendTo": "=your-email@gmail.com",
         "subject": "Welcome to ShopFlow Store! 🎉",
         "message": "=Hi {{ $json.customer_name }},<p>\n\nThank you for your first purchase with ShopFlow Store! We're excited to have you as part of our community.<p>\n\n📦 **Order Details**<p>\n\n* Order #: {{ $json.order_number }}<br>\n* Product: {{ $json.product }}<br>\n* Total: ${{ $json.order_total }}<p>\n\nAs a welcome gift, enjoy **10% OFF** your next purchase.<p>\n\n**Promo Code:** WELCOME10<p>\n\nWe hope you love your order, and we look forward to serving you again soon.<p>\n\nBest regards,<br>\n**ShopFlow Store Team**\n",
         "options": {
@@ -868,7 +868,7 @@
   "versionId": "ed463709-d20a-4dc6-96f3-0b0060acc19d",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "1e47f1ac8b0e43cb42acfdb23ec04cf6e4f6e87451a59e9ef5056f3253201fc8"
+    "instanceId": "YOUR_INSTANCE_ID"
   },
   "id": "cEHcmERVd7a7ZC6V",
   "tags": []
