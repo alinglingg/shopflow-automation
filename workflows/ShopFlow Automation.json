@@ -1,0 +1,875 @@
+{
+  "name": "ShopFlow Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c872536a-0dbb-4faa-81bb-13d42f49a7a9",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -160,
+        0
+      ],
+      "id": "f7975d69-8b28-4c71-9d46-97c3f2c9be04",
+      "name": "Shopify Order",
+      "webhookId": "c872536a-0dbb-4faa-81bb-13d42f49a7a9"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are a customer classification system for an e-commerce store.\n\nBased on this customer data, classify them into exactly one of these three categories:\n- New (orders_count is 0 or 1)\n- Returning (orders_count is 2 to 4)\n- VIP (orders_count is 5 or more, OR total_spent is over $2000)\n\nCustomer data:\nName: {{ $json.body.customer.first_name }} {{ $json.body.customer.last_name }}\nEmail: {{ $json.body.customer.email }}\nTotal orders: {{ $json.body.customer.orders_count }}\nTotal spent: ${{ $json.body.customer.total_spent }}\nCurrent order value: ${{ $json.body.total_price }}\n\nReply with ONLY one word: New, Returning, or VIP"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        48,
+        0
+      ],
+      "id": "35bae7c2-ab6e-4e96-a6db-8dfd59d1f2a1",
+      "name": "AI: Classify Customer",
+      "credentials": {
+        "openAiApi": {
+          "id": "jsjMi2GFGRHaQKJm",
+          "name": "OpenAI account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d7051bfc-82d5-49f9-accf-fdd5e8e9da94",
+              "name": "customer_type",
+              "value": "={{ $json.output[0].content[0].text.trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "2829c789-23e5-4ab5-b5f7-183edd469134",
+              "name": "customer_name",
+              "value": "={{ $('Shopify Order').item.json.body.customer.first_name }} {{ $('Shopify Order').item.json.body.customer.last_name }}",
+              "type": "string"
+            },
+            {
+              "id": "26ba90e3-4599-43b1-a859-01fbe4cb545c",
+              "name": "customer_email",
+              "value": "={{ $('Shopify Order').item.json.body.customer.email }}",
+              "type": "string"
+            },
+            {
+              "id": "7d83a560-9226-499e-b394-c28c4c2818ec",
+              "name": "order_number",
+              "value": "={{ $('Shopify Order').item.json.body.order_number }}",
+              "type": "number"
+            },
+            {
+              "id": "ad059cd6-c742-4a18-b251-e16209d35894",
+              "name": "order_total",
+              "value": "={{ $('Shopify Order').item.json.body.customer.total_spent }}",
+              "type": "string"
+            },
+            {
+              "id": "833477de-9bae-40fd-ae4d-3c3cbbb06feb",
+              "name": "product",
+              "value": "={{ $('Shopify Order').item.json.body.line_items[0].title }}",
+              "type": "string"
+            },
+            {
+              "id": "01f91c0a-c8e0-4675-b8f6-6f9f4b1d6bdd",
+              "name": "orders_count",
+              "value": "={{ $('Shopify Order').item.json.body.customer.orders_count }}",
+              "type": "string"
+            },
+            {
+              "id": "970db440-1b83-48dc-8e5e-278c2250f1c7",
+              "name": "total_spent",
+              "value": "={{ $('Shopify Order').item.json.body.customer.total_spent }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        -16
+      ],
+      "id": "aebba066-1b38-498b-aafa-e64470c91ac4",
+      "name": "🔧 Structure Order Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0be4b591-101b-4eb5-9124-1631af90436c",
+              "leftValue": "={{ $json.customer_email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        640,
+        -16
+      ],
+      "id": "b88ff95a-a95e-4d71-8047-f7018f375637",
+      "name": "Validate Order Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.customer_type }}",
+                    "rightValue": "New",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "74d8665b-ec49-4ab3-8085-afad0fb24a48"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "407ca105-b438-423c-9715-a22bd42623cf",
+                    "leftValue": "={{ $json.customer_type }}",
+                    "rightValue": "Returning",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a2e40724-9f54-4228-a2cc-d2697875326c",
+                    "leftValue": "={{ $json.customer_type }}",
+                    "rightValue": "VIP",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        0
+      ],
+      "id": "43212102-72d1-40ec-b454-d72811a05c02",
+      "name": "Route by Segment"
+    },
+    {
+      "parameters": {
+        "sendTo": "=inquiry.asdautomations@gmail.com",
+        "subject": "=Thanks for coming back, {{ $json.customer_name }}! 🙌",
+        "message": "=Hi {{ $json.customer_name }},<p>\n\nWe're happy to see you shopping with us again! Your continued support means a lot.<p>\n\n📦 **Order Details**<p>\n\n* Order #: {{ $json.order_number }}<br>\n* Product: {{ $json.product }}<br>\n* Total: ${{ $json.order_total }}<p>\n\nAs a valued returning customer, we've prepared a special reward for you.<p>\n\n🎁 **15% OFF your next order**<p>\n\n**Promo Code:** RETURN15<p>\n\nThank you for choosing ShopFlow Store. We can't wait to serve you again.<p>\n\nBest regards,<br>\n**ShopFlow Store Team**\n",
+        "options": {
+          "senderName": "ShopFlow Store"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1136,
+        48
+      ],
+      "id": "f13e3434-8ed1-41c4-9936-f2c834f7362d",
+      "name": "Returning Customer Email",
+      "webhookId": "fb080b25-e6f2-4668-aec4-1bfeadb22cdb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BkJ2XKJmjphznp4z",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "=inquiry.asdautomations@gmail.com",
+        "subject": "=Exclusive VIP Reward for You, {{ $json.customer_name }}! ⭐",
+        "message": "=Hi {{ $json.customer_name }},<p>\n\nYou're one of our most valued customers, and we want to thank you for your continued trust in ShopFlow Store.<p>\n\n📦 **Order Details**<p>\n\n* Order #: {{ $json.order_number }}<br>\n* Product: {{ $json.product }}<br>\n* Total: ${{ $json.order_total }}<p>\n\nAs a VIP member, you have unlocked an exclusive reward:<p>\n\n🌟 **25% OFF your next purchase**<p>\n\n**VIP Promo Code:** VIP25<p>\n\nPlus, you'll receive early access to selected promotions and special offers.<p>\n\nThank you for being part of our VIP community.<p>\n\nWarm regards,<br>\n**ShopFlow Store Team**\n",
+        "options": {
+          "senderName": "ShopFlow Store"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1136,
+        272
+      ],
+      "id": "5f2c5618-c422-4f88-ac16-39181cd1c1df",
+      "name": "VIP Customer Email",
+      "webhookId": "fb080b25-e6f2-4668-aec4-1bfeadb22cdb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BkJ2XKJmjphznp4z",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo",
+          "mode": "list",
+          "cachedResultName": "ShopFlow CRM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 508059576,
+          "mode": "list",
+          "cachedResultName": "Customers",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo/edit#gid=508059576"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Customer ID": "=C{{ $('🔧 Structure Order Data').item.json.order_number }}",
+            "Name": "={{ $('🔧 Structure Order Data').item.json.customer_name }}",
+            "Email": "={{ $('🔧 Structure Order Data').item.json.customer_email }}",
+            "Total Orders": "={{ $('🔧 Structure Order Data').item.json.orders_count }}",
+            "Total Spent": "=${{ $('🔧 Structure Order Data').item.json.order_total }}",
+            "Segment": "={{ $('🔧 Structure Order Data').item.json.customer_type }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Customer ID",
+              "displayName": "Customer ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Orders",
+              "displayName": "Total Orders",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Total Spent",
+              "displayName": "Total Spent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Segment",
+              "displayName": "Segment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        48
+      ],
+      "id": "aebc9df8-294f-485f-9188-271d0b9da131",
+      "name": "Log to Customers",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "plDn6sQkx7MbowfL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo",
+          "mode": "list",
+          "cachedResultName": "ShopFlow CRM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1513992644,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo/edit#gid=1513992644"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Order ID ": "=#{{ $('🔧 Structure Order Data').item.json.order_number }}",
+            "Customer ID": "=C{{ $('🔧 Structure Order Data').item.json.order_number }}",
+            "Customer Email": "={{ $('🔧 Structure Order Data').item.json.customer_email }}",
+            "Product": "={{ $('🔧 Structure Order Data').item.json.product }}",
+            "Order Total": "=${{ $('🔧 Structure Order Data').item.json.total_spent }}",
+            "Date ": "={{ $now.toFormat('MMMM dd, yyyy') }}",
+            "Status": "Completed"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Order ID ",
+              "displayName": "Order ID ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer ID",
+              "displayName": "Customer ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Email",
+              "displayName": "Customer Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Total",
+              "displayName": "Order Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date ",
+              "displayName": "Date ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1520,
+        48
+      ],
+      "id": "27504aea-e3e1-44d4-abd5-f7298f453c70",
+      "name": "Log to Orders",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "plDn6sQkx7MbowfL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo",
+          "mode": "list",
+          "cachedResultName": "ShopFlow CRM",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2102531066,
+          "mode": "list",
+          "cachedResultName": "Email History",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jCqRK63wecTF61ic6n8xSPSLKiKCgs5glI7ExEa2xwo/edit#gid=2102531066"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $now.toFormat('MMMM dd, yyyy') }}",
+            "Customer ID": "=C{{ $('🔧 Structure Order Data').item.json.order_number }}",
+            "Customer Email": "={{ $('🔧 Structure Order Data').item.json.customer_email }}",
+            "Segment": "={{ $('🔧 Structure Order Data').item.json.customer_type }}",
+            "Status": "Sent",
+            "Subject": "={{ $('🔧 Structure Order Data').item.json.customer_type }} Order Confirmation - #{{ $('🔧 Structure Order Data').item.json.order_number }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer ID",
+              "displayName": "Customer ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer Email",
+              "displayName": "Customer Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Segment",
+              "displayName": "Segment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1680,
+        48
+      ],
+      "id": "c022d6c8-89aa-4698-8be3-44782b60fe18",
+      "name": "Log to Email History",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "plDn6sQkx7MbowfL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0B8JMD23MX",
+          "mode": "list",
+          "cachedResultName": "shopflow-orders"
+        },
+        "text": "=🛍️ *New Order Received!*\n\n👤 Customer: {{ $('🔧 Structure Order Data').item.json.customer_name }}\n🏷️ Segment: {{ $('🔧 Structure Order Data').item.json.customer_type }}\n📦 Product: {{ $('🔧 Structure Order Data').item.json.product }}\n💰 Order Total: ${{ $('🔧 Structure Order Data').item.json.total_spent }}\n🔢 Order ID: #{{ $('🔧 Structure Order Data').item.json.order_number }}\n\n✉️ Confirmation email sent automatically.\n📊 CRM updated.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        1888,
+        48
+      ],
+      "id": "3a5eb8a5-1d79-400f-bc61-ba4971b7c24e",
+      "name": "Slack: Team alert",
+      "webhookId": "a01f4504-3977-47a3-8d2b-8897be653cae",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "KdUPZUgw2fMScdJc",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "errorMessage": "=Invalid order: missing customer name or email. Order #{{ $json.order_number }} was rejected."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        848,
+        224
+      ],
+      "id": "582f6bc0-b4c7-49ba-a2ac-e722dcbb270b",
+      "name": "Reject Invalid Order"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0B9B67TWAU",
+          "mode": "list",
+          "cachedResultName": "shopflow-error"
+        },
+        "text": "=⚠️ *AI Classification Failed!*\n\nCustomer: {{ $('Shopify Order').item.json.body.customer.first_name }} {{ $('Shopify Order').item.json.body.customer.last_name }}\nEmail: {{ $('Shopify Order').item.json.body.customer.email }}\nOrder: #{{ $('Shopify Order').item.json.body.order_number }}\n\nPlease classify manually and send confirmation email.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        512,
+        304
+      ],
+      "id": "c55f7036-0e51-445e-8845-a6be8cbd83e8",
+      "name": "Slack: Error Alert",
+      "webhookId": "82375a94-a16c-41a4-b2c6-7ef2b75cc80a",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "KdUPZUgw2fMScdJc",
+          "name": "Slack OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "=inquiry.asdautomations@gmail.com",
+        "subject": "Welcome to ShopFlow Store! 🎉",
+        "message": "=Hi {{ $json.customer_name }},<p>\n\nThank you for your first purchase with ShopFlow Store! We're excited to have you as part of our community.<p>\n\n📦 **Order Details**<p>\n\n* Order #: {{ $json.order_number }}<br>\n* Product: {{ $json.product }}<br>\n* Total: ${{ $json.order_total }}<p>\n\nAs a welcome gift, enjoy **10% OFF** your next purchase.<p>\n\n**Promo Code:** WELCOME10<p>\n\nWe hope you love your order, and we look forward to serving you again soon.<p>\n\nBest regards,<br>\n**ShopFlow Store Team**\n",
+        "options": {
+          "senderName": "ShopFlow Store"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1136,
+        -144
+      ],
+      "id": "7251d5b2-f47c-48ef-87a8-7bbd7e95b609",
+      "name": "New Customer Email",
+      "webhookId": "fb080b25-e6f2-4668-aec4-1bfeadb22cdb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BkJ2XKJmjphznp4z",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Shopify Order": {
+      "main": [
+        [
+          {
+            "node": "AI: Classify Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Classify Customer": {
+      "main": [
+        [
+          {
+            "node": "🔧 Structure Order Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack: Error Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔧 Structure Order Data": {
+      "main": [
+        [
+          {
+            "node": "Validate Order Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Order Data": {
+      "main": [
+        [
+          {
+            "node": "Route by Segment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Invalid Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Segment": {
+      "main": [
+        [
+          {
+            "node": "New Customer Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Returning Customer Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "VIP Customer Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Returning Customer Email": {
+      "main": [
+        [
+          {
+            "node": "Log to Customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VIP Customer Email": {
+      "main": [
+        [
+          {
+            "node": "Log to Customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Customers": {
+      "main": [
+        [
+          {
+            "node": "Log to Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Orders": {
+      "main": [
+        [
+          {
+            "node": "Log to Email History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Email History": {
+      "main": [
+        [
+          {
+            "node": "Slack: Team alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Customer Email": {
+      "main": [
+        [
+          {
+            "node": "Log to Customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "OGew4NLEnldmlwC0",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "ed463709-d20a-4dc6-96f3-0b0060acc19d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1e47f1ac8b0e43cb42acfdb23ec04cf6e4f6e87451a59e9ef5056f3253201fc8"
+  },
+  "id": "cEHcmERVd7a7ZC6V",
+  "tags": []
+}
