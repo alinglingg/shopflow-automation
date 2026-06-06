@@ -132,12 +132,16 @@ shopflow-automation/
 │   └── ShopFlow_Error_Handler.json
 └── screenshots/
     ├── canvas.png
-    ├── crm-dashboard.png
-    ├── customers-sheet.png
-    ├── orders-sheet.png
-    ├── email-history-sheet.png
-    ├── slack-notification.png
-    └── error-alert.png
+    ├── canvas-error-handler.png
+    ├── crm-dashboard-customer.png
+    ├── crm-dashboard-email-history.png
+    ├── crm-dashboard-orders.png
+    ├── email-new-customer.png
+    ├── email-returning-customer.png
+    ├── email-vip-customer.png
+    ├── slack-alert.png
+    ├── slack-error-alert.png
+    └── telegram-error-alert.png
 ```
 
 ---
